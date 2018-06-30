@@ -1,7 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {loginSuccess,logout} from '../actions/auth'
-import { withRouter } from 'react-router'
+import { loginSuccess, logout } from '../actions/auth'
+import { withRouter } from 'react-router-dom'
+import { Mutation } from 'react-apollo'
+import gql from 'graphql-tag'
+
+const loginMutation = gql`mutation login($username : String! , $password: String!) {
+    token : login(username :$username , password : $password)
+  }
+`
 class LoginForm extends Component {
 
     state = {
@@ -20,7 +27,7 @@ class LoginForm extends Component {
             password: e.target.value
         })
     }
-
+    
     onSubmit = (e) => {
         e.preventDefault()
 
@@ -45,7 +52,7 @@ class LoginForm extends Component {
         })
     }
     render() {
-        if(this.props.isLoggedIn){
+        if (this.props.isLoggedIn) {
             return (
                 <div>
                     <p>LoggedIn </p>
@@ -55,47 +62,63 @@ class LoginForm extends Component {
             )
         }
         return (
-            <div>
-                <form onSubmit={this.onSubmit}>
-                    <div>
-                        <input
-                            placeholder="username"
-                            type="text"
-                            onChange={this.onUsernameChange} />
-                    </div>
+            <Mutation mutation={loginMutation}>
+                {(mutateFn , result) => {
+                    return (<div>
+                        <form onSubmit={ async(e)=>{
+                            e.preventDefault()
+                            const result =await  mutateFn({
+                                variables :{
+                                    username : this.state.username,
+                                    password : this.state.password
+                                }
+                            })
 
-                    <div>
-                        <input
-                            placeholder="password"
-                            type="password"
-                            onChange={this.onPasswordChange} />
-                    </div>
+                            console.log(result);
+                            this.props.onLoginSuccess(result.data.token)
+                        }}>
+                            <div>
+                                <input
+                                    placeholder="username"
+                                    type="text"
+                                    onChange={this.onUsernameChange} />
+                            </div>
 
-                    <button type="submit">login</button>
-                </form>
+                            <div>
+                                <input
+                                    placeholder="password"
+                                    type="password"
+                                    onChange={this.onPasswordChange} />
+                            </div>
 
-            </div>
+                            <button type="submit">login</button>
+                        </form>
+
+                    </div>)
+                }}
+            </Mutation>
+
         )
     }
 }
 
 const mapStateToProps = (state) => {
     return {
-        isLoggedIn : state.auth.token != null
+        isLoggedIn: state.auth.token != null
         //isLoggedIn :typeof state.auth.token !== 'undefined'
     }
 }
 
-const mapDispatchToProps = (dispatch,ownProps) => {
-    console.log(ownProps)
+const mapDispatchToProps = (dispatch, ownProps) => {
+    //console.log(ownProps)
     return {
-        onLoginSuccess:(token)=>{
+        onLoginSuccess: (token) => {
             dispatch(loginSuccess(token))
             ownProps.history.replace('/')
         },
-        onLogout : ()=>{
+        onLogout: () => {
             dispatch(logout())
         }
     }
 }
-export default withRouter(connect(mapStateToProps,mapDispatchToProps)(LoginForm))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LoginForm))

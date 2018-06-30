@@ -1,30 +1,33 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Cookies from 'universal-cookie';
+import Cookies from 'universal-cookie'
 import './index.css'
 import App from './App'
-import { createStore,applyMiddleware,compose } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import { Provider } from 'react-redux'
 import reducers from './reducers'
-import thunk from 'redux-thunk';
+import thunk from 'redux-thunk'
+import { ApolloProvider } from 'react-apollo'
+import createApolloClient from './libs/createApolloClient'
 
 
-const cookies = new Cookies();
+const cookies = new Cookies()
 
 const token = cookies.get('token')
 const store = createStore(
-	reducers,
-	{auth : {token}},
-	compose(
-		applyMiddleware(thunk),
-		window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
-	)
+  reducers,
+  {auth: {token}},
+  compose(
+    applyMiddleware(thunk),
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
+);
 
-)
+const client = createApolloClient(store)
 
-//console.log(store.getState())
+// console.log(store.getState())
 store.subscribe(() => {
-  //console.log(store.getState())
+  // console.log(store.getState())
 })
 
 /*
@@ -38,7 +41,9 @@ store.dispatch({
 })
 */
 ReactDOM.render(
-	<Provider store={store}>
-        <App />
-	</Provider>, 
-document.getElementById('root'))
+  <ApolloProvider client={client}>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </ApolloProvider>,
+  document.getElementById('root'))
