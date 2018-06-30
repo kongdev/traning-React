@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import {loginSuccess,logout} from '../actions/auth'
+import { withRouter } from 'react-router'
 class LoginForm extends Component {
 
     state = {
@@ -38,6 +39,7 @@ class LoginForm extends Component {
         }).then((json) => {
             //console.log(json)
             this.props.onLoginSuccess(json.token)
+
         }).catch(e => {
             console.error(e)
         })
@@ -84,14 +86,16 @@ const mapStateToProps = (state) => {
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch,ownProps) => {
+    console.log(ownProps)
     return {
         onLoginSuccess:(token)=>{
             dispatch(loginSuccess(token))
+            ownProps.history.replace('/')
         },
         onLogout : ()=>{
             dispatch(logout())
         }
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(LoginForm)
+export default withRouter(connect(mapStateToProps,mapDispatchToProps)(LoginForm))

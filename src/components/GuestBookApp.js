@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import NewPostForm from './NewPostForm';
 import FilterablePostList from './FilterablePostList';
-import {connect} from 'react-redux'
-import {createPost,receivePost,fetchPosts} from '../actions/post'
-import LoginForm from './LoginForm';
+import { connect } from 'react-redux'
+import { createPost, receivePost, fetchPosts } from '../actions/post'
+
+
 class GuestBookApp extends Component {
     state = {
         //posts: [],
@@ -11,7 +12,7 @@ class GuestBookApp extends Component {
     }
 
     handleOnCreatePost = ({ title, content }) => {
-        this.props.onCreatePost(title,content)   
+        this.props.onCreatePost(title, content)
     }
 
     handleFilterInputChange = (e) => {
@@ -29,7 +30,7 @@ class GuestBookApp extends Component {
 
         return (
             <div>
-                <LoginForm />
+                
                 <h1>GuestBookApp</h1>
                 <NewPostForm onCreatePost={this.handleOnCreatePost} />
                 <input type="text" onChange={this.handleFilterInputChange} value={this.state.filterText} />
@@ -40,23 +41,23 @@ class GuestBookApp extends Component {
     }
 }
 
-const mapStateToProps = (state) =>{
-    return {posts : state.posts}
+const mapStateToProps = (state) => {
+    return { posts: state.posts }
 }
 
-const mapDispatchToProps = (dispatch) =>{
+const mapDispatchToProps = (dispatch) => {
     return {
-        onCreatePost : (title,content)=>{
-         
-            dispatch(createPost(title,content))
-            
+        onCreatePost: (title, content) => {
+
+            dispatch(createPost(title, content))
+
         },
         /*onPostReceived : (posts)=>{
             dispatch(receivePost(posts))
         }*/
-        fetchPosts:()=>{
+        fetchPosts: () => {
             dispatch(fetchPosts())
         }
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(GuestBookApp)
+export default connect(mapStateToProps, mapDispatchToProps)(GuestBookApp)
