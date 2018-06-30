@@ -1,29 +1,45 @@
+import { combineReducers } from 'redux'
 
-import { combineReducers} from 'redux'
-const counterReducer = (state = 0 , action) => {
-    switch (action.type) {
-      case 'INCREASE_COUNTER':
-        return state + 1
-  
+const counterReducer = (state = 0, action) => {
+  switch (action.type) {
+    case 'INCREASE_COUNTER':
+      return state + 1
+
+    default:
+      return state
+  }
+}
+
+const postReducer = (state = [], action) => {
+  switch (action.type) {
+    case 'CREATE_POST':
+      return [...state, { title: action.title, content: action.content }]
+    case 'RECEIVE_POST':
+      return [...state, ...action.posts]
+    default:
+      return state
+  }
+}
+
+const authReducer = (state = {}, action) => {
+  switch (action.type) {
+    case 'LOGIN_SUCCESS':
+      return {
+        ...state,
+        token: action.token
+      }
+    case 'LOGOUT':
+      return {}
+
       default:
-        return state
-    }
+      return state
   }
-  
-  const postReducer = (state = [] , action) => {
-      switch (action.type) {
-          case 'CREATE_POST':
-            
-            return [...state,{title : action.title , content : action.content}]
-          default:
-            return state
-        }
-  }
-  
-  const reducer = combineReducers({
-      counter : counterReducer,
-      posts : postReducer,
-  })
+}
 
+const reducer = combineReducers({
+  counter: counterReducer,
+  posts: postReducer,
+  auth : authReducer,
+})
 
-  export default reducer
+export default reducer

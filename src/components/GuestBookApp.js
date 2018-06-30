@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import NewPostForm from './NewPostForm';
 import FilterablePostList from './FilterablePostList';
 import {connect} from 'react-redux'
-
+import {createPost,receivePost,fetchPosts} from '../actions/post'
+import LoginForm from './LoginForm';
 class GuestBookApp extends Component {
     state = {
         //posts: [],
@@ -10,16 +11,9 @@ class GuestBookApp extends Component {
     }
 
     handleOnCreatePost = ({ title, content }) => {
-        const _id = '' + Math.random()
-        const post = { _id, title, content }
-        //const newPosts = this.state.posts.concat()
-        /*const newPosts = [post, ...this.state.posts]
-        this.setState({
-            posts: newPosts
-        });*/
-        this.props.onCreatePost(post)
-       
+        this.props.onCreatePost(title,content)   
     }
+
     handleFilterInputChange = (e) => {
         this.setState({
             filterText: e.target.value
@@ -27,14 +21,7 @@ class GuestBookApp extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props)
-        /*fetch('http://localhost:3000/posts')
-        .then(res=>res.json())
-        .then(json=>{
-            this.setState({
-                posts : json
-            })
-        })*/
+        this.props.fetchPosts()
     }
 
 
@@ -42,6 +29,7 @@ class GuestBookApp extends Component {
 
         return (
             <div>
+                <LoginForm />
                 <h1>GuestBookApp</h1>
                 <NewPostForm onCreatePost={this.handleOnCreatePost} />
                 <input type="text" onChange={this.handleFilterInputChange} value={this.state.filterText} />
@@ -58,10 +46,16 @@ const mapStateToProps = (state) =>{
 
 const mapDispatchToProps = (dispatch) =>{
     return {
-        onCreatePost : (post)=>{
-            dispatch({
-                type : 'CREATE_POST',...post
-            })
+        onCreatePost : (title,content)=>{
+         
+            dispatch(createPost(title,content))
+            
+        },
+        /*onPostReceived : (posts)=>{
+            dispatch(receivePost(posts))
+        }*/
+        fetchPosts:()=>{
+            dispatch(fetchPosts())
         }
     }
 }

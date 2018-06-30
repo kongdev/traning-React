@@ -1,13 +1,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import Cookies from 'universal-cookie';
 import './index.css'
 import App from './App'
-
-import { createStore } from 'redux'
+import { createStore,applyMiddleware,compose } from 'redux'
 import { Provider } from 'react-redux'
 import reducers from './reducers'
+import thunk from 'redux-thunk';
 
-const store = createStore(reducers)
+
+const cookies = new Cookies();
+
+const token = cookies.get('token')
+const store = createStore(
+	reducers,
+	{auth : {token}},
+	compose(
+		applyMiddleware(thunk),
+		window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+	)
+
+)
 
 //console.log(store.getState())
 store.subscribe(() => {
