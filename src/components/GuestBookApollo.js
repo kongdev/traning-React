@@ -5,42 +5,38 @@ import { Query, Mutation, graphql } from 'react-apollo'
 import PostList from './PostList'
 import NewPostForm from './NewPostForm';
 
-
-const postsQuery = gql`
-    query listPost {
-  posts {
-    id
+const _postFragment = gql`
+fragment postFragment on Post {
+	id
     title
     tags {
       name
     }
     content
-  }
+}`
+
+
+const postsQuery = gql`
+    query listPost {
+		posts {
+			...postFragment
+		}
 }
-`
+${_postFragment}`
 
 const postCreatedSub = gql`subscription postCreate{
-	postCreated {
-	  id
-	  title
-	  tags {
-		name
-	  }
-	  content
-	}
-  }`
+		postCreated {
+			...postFragment
+		}
+}
+${_postFragment}`
 
 const createPostMutation = gql`mutation createPost($postData : PostData!) {
     post :createPost(data: $postData){
-      id
-      title
-      content
-      tags{
-        name
-      }
+      ...postFragment
     }
   }
-`
+	${_postFragment}`
 /*
 export default class GuestBookApollo extends Component {
     render() {
@@ -109,13 +105,13 @@ export default graphql(postsQuery, {
 			subscribe: () => {
 				res.data.subscribeToMore({
 					document: postCreatedSub,
-					updateQuery: (prev, {subscriptionData}) => {
-						if(!subscriptionData.data.postCreated) return prev
+					updateQuery: (prev, { subscriptionData }) => {
+						if (!subscriptionData.data.postCreated) return prev
 
 						const postCreated = subscriptionData.data.postCreated
 
-						return Object.assign({},prev,{
-							posts:[...prev.posts,postCreated]
+						return Object.assign({}, prev, {
+							posts: [...prev.posts, postCreated]
 						})
 						//console.log('prev', prev)
 						//console.log('res', res)
