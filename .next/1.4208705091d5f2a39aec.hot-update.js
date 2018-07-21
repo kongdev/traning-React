@@ -9,10 +9,13 @@ webpackHotUpdate(1,{
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__("./node_modules/react/index.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__createApolloClient__ = __webpack_require__("./libs/createApolloClient.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_next_head__ = __webpack_require__("./node_modules/next/head.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_next_head___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_next_head__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_react_apollo__ = __webpack_require__("./node_modules/react-apollo/react-apollo.browser.umd.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_react_apollo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_react_apollo__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__createReduxStore__ = __webpack_require__("./libs/createReduxStore.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_next_head__ = __webpack_require__("./node_modules/next/head.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_next_head___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_next_head__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_react_apollo__ = __webpack_require__("./node_modules/react-apollo/react-apollo.browser.umd.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_react_apollo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_react_apollo__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_universal_cookie__ = __webpack_require__("./node_modules/universal-cookie/lib/index.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_universal_cookie___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_universal_cookie__);
 
 var _jsxFileName = "/home/kong/traning-React/libs/with-apollo-client.js";
 
@@ -42,6 +45,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 
+
+
 /* harmony default export */ __webpack_exports__["a"] = (function (App) {
   var _class, _temp;
 
@@ -55,13 +60,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function () {
         var _getInitialProps = _asyncToGenerator(
         /*#__PURE__*/
-        __WEBPACK_IMPORTED_MODULE_0__babel_runtime_regenerator___default.a.mark(function _callee(ctx) {
-          var Component, router, appProps, apollo, apolloState;
+        __WEBPACK_IMPORTED_MODULE_0__babel_runtime_regenerator___default.a.mark(function _callee(_ref) {
+          var Component, router, ctx, appProps, cookies, token, initState, store, apollo, apolloState, reduxState;
           return __WEBPACK_IMPORTED_MODULE_0__babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  Component = ctx.Component, router = ctx.router;
+                  Component = _ref.Component, router = _ref.router, ctx = _ref.ctx;
                   appProps = {};
 
                   if (!App.getInitialProps) {
@@ -70,63 +75,76 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
                   }
 
                   _context.next = 5;
-                  return App.getInitialProps(ctx);
+                  return App.getInitialProps({
+                    Component: Component,
+                    router: router,
+                    ctx: ctx
+                  });
 
                 case 5:
                   appProps = _context.sent;
 
                 case 6:
-                  // Run all GraphQL queries in the component tree
-                  // and extract the resulting data
-                  apollo = Object(__WEBPACK_IMPORTED_MODULE_2__createApolloClient__["a" /* default */])();
+                  cookies = new __WEBPACK_IMPORTED_MODULE_6_universal_cookie___default.a(ctx.req ? ctx.req.headers.cookie : undefined);
+                  token = cookies.get('token');
+                  initState = {
+                    auth: {
+                      token: token
+                    }
+                  };
+                  store = Object(__WEBPACK_IMPORTED_MODULE_3__createReduxStore__["a" /* default */])(initState);
+                  apollo = Object(__WEBPACK_IMPORTED_MODULE_2__createApolloClient__["a" /* default */])(store);
 
                   if (process.browser) {
-                    _context.next = 17;
+                    _context.next = 21;
                     break;
                   }
 
-                  _context.prev = 8;
-                  _context.next = 11;
-                  return Object(__WEBPACK_IMPORTED_MODULE_4_react_apollo__["getDataFromTree"])(__WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(App, _extends({}, appProps, {
+                  _context.prev = 12;
+                  _context.next = 15;
+                  return Object(__WEBPACK_IMPORTED_MODULE_5_react_apollo__["getDataFromTree"])(__WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(App, _extends({}, appProps, {
                     Component: Component,
                     router: router,
                     apolloClient: apollo,
+                    reduxStore: store,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 23
+                      lineNumber: 29
                     }
                   })));
 
-                case 11:
-                  _context.next = 16;
+                case 15:
+                  _context.next = 20;
                   break;
 
-                case 13:
-                  _context.prev = 13;
-                  _context.t0 = _context["catch"](8);
+                case 17:
+                  _context.prev = 17;
+                  _context.t0 = _context["catch"](12);
                   // Prevent Apollo Client GraphQL errors from crashing SSR.
                   // Handle them in components via the data.error prop:
                   // http://dev.apollodata.com/react/api-queries.html#graphql-query-data-error
                   console.error('Error while running `getDataFromTree`', _context.t0);
 
-                case 16:
+                case 20:
                   // getDataFromTree does not call componentWillUnmount
                   // head side effect therefore need to be cleared manually
-                  __WEBPACK_IMPORTED_MODULE_3_next_head___default.a.rewind();
+                  __WEBPACK_IMPORTED_MODULE_4_next_head___default.a.rewind();
 
-                case 17:
+                case 21:
                   // Extract query data from the Apollo store
                   apolloState = apollo.cache.extract();
+                  reduxState = store.getState();
                   return _context.abrupt("return", _objectSpread({}, appProps, {
-                    apolloState: apolloState
+                    apolloState: apolloState,
+                    reduxState: reduxState
                   }));
 
-                case 19:
+                case 24:
                 case "end":
                   return _context.stop();
               }
             }
-          }, _callee, this, [[8, 13]]);
+          }, _callee, this, [[12, 17]]);
         }));
 
         return function getInitialProps(_x) {
@@ -141,7 +159,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       _classCallCheck(this, Apollo);
 
       _this = _possibleConstructorReturn(this, (Apollo.__proto__ || Object.getPrototypeOf(Apollo)).call(this, props));
-      _this.apolloClient = Object(__WEBPACK_IMPORTED_MODULE_2__createApolloClient__["a" /* default */])(undefined, props.apolloState); //this.apolloClient = createApolloClient(props.apolloState)
+      _this.reduxStore = Object(__WEBPACK_IMPORTED_MODULE_3__createReduxStore__["a" /* default */])(props.reduxState);
+      _this.apolloClient = Object(__WEBPACK_IMPORTED_MODULE_2__createApolloClient__["a" /* default */])(_this.reduxStore, props.apolloState); //this.apolloClient = createApolloClient(props.apolloState)
 
       return _this;
     }
@@ -151,9 +170,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
       value: function render() {
         return __WEBPACK_IMPORTED_MODULE_1_react___default.a.createElement(App, _extends({}, this.props, {
           apolloClient: this.apolloClient,
+          reduxStore: this.reduxStore,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 58
+            lineNumber: 67
           }
         }));
       }
@@ -1380,6 +1400,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__libs_with_apollo_client__ = __webpack_require__("./libs/with-apollo-client.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_react_apollo__ = __webpack_require__("./node_modules/react-apollo/react-apollo.browser.umd.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_react_apollo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_react_apollo__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_react_redux__ = __webpack_require__("./node_modules/react-redux/es/index.js");
 
 var _jsxFileName = "/home/kong/traning-React/pages/_app.js";
 
@@ -1407,6 +1428,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 
+
 var MyApp =
 /*#__PURE__*/
 function (_App) {
@@ -1423,51 +1445,58 @@ function (_App) {
     value: function render() {
       var _props = this.props,
           Component = _props.Component,
-          apolloClient = _props.apolloClient;
-      return __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5_react_apollo__["ApolloProvider"], {
-        client: this.props.apolloClient,
-        __source: {
-          fileName: _jsxFileName,
-          lineNumber: 21
-        }
-      }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_next_app__["Container"], {
+          apolloClient = _props.apolloClient,
+          reduxStore = _props.reduxStore;
+      return __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_6_react_redux__["a" /* Provider */], {
+        store: reduxStore,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 22
         }
-      }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement("div", {
+      }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5_react_apollo__["ApolloProvider"], {
+        client: apolloClient,
         __source: {
           fileName: _jsxFileName,
           lineNumber: 23
+        }
+      }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_next_app__["Container"], {
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 24
+        }
+      }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement("div", {
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 25
         }
       }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3_next_link___default.a, {
         href: "/",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 24
+          lineNumber: 26
         }
       }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement("a", {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 25
+          lineNumber: 27
         }
       }, "home")), __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3_next_link___default.a, {
-        href: "/about",
+        href: "/login",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 29
+          lineNumber: 31
         }
       }, __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement("a", {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 30
+          lineNumber: 32
         }
-      }, "about"))), __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(Component, _extends({}, this.props, {
+      }, "login"))), __WEBPACK_IMPORTED_MODULE_2_react___default.a.createElement(Component, _extends({}, this.props, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 35
+          lineNumber: 37
         }
-      }))));
+      })))));
     }
   }], [{
     key: "getInitialProps",
@@ -1540,4 +1569,4 @@ function (_App) {
 /***/ })
 
 })
-//# sourceMappingURL=1.0ac18ff6c2c4151229da.hot-update.js.map
+//# sourceMappingURL=1.4208705091d5f2a39aec.hot-update.js.map

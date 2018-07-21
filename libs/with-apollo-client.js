@@ -1,21 +1,27 @@
 import createApolloClient from './createApolloClient'
+import createReduxStore from './createReduxStore'
 import Head from 'next/head'
 import { getDataFromTree } from 'react-apollo'
+import Cookies from 'universal-cookie'
+
 
 export default (App) => {
   return class Apollo extends React.Component {
     static displayName = 'withApollo(App)'
-    static async getInitialProps (ctx) {
-      const { Component, router } = ctx
+    static async getInitialProps({ Component, router, ctx }) {
+     
 
       let appProps = {}
       if (App.getInitialProps) {
-        appProps = await App.getInitialProps(ctx)
+        appProps = await App.getInitialProps({ Component, router, ctx })
       }
 
-      // Run all GraphQL queries in the component tree
-      // and extract the resulting data
-      const apollo = createApolloClient()
+      const cookies = new Cookies(ctx.req ? ctx.req.headers.cookie : undefined)
+
+      const token = cookies.get('token')
+      const initState = { auth: { token } }
+      const store = createReduxStore(initState)
+      const apollo = createApolloClient(store)
       if (!process.browser) {
         try {
           // Run all GraphQL queries
@@ -25,6 +31,7 @@ export default (App) => {
               Component={Component}
               router={router}
               apolloClient={apollo}
+              reduxStore={store}
             />
           )
         } catch (error) {
@@ -41,21 +48,23 @@ export default (App) => {
 
       // Extract query data from the Apollo store
       const apolloState = apollo.cache.extract()
-
+      const reduxState = store.getState()
       return {
         ...appProps,
-        apolloState
+        apolloState,
+        reduxState
       }
     }
 
-    constructor (props) {
+    constructor(props) {
       super(props)
-      this.apolloClient = createApolloClient(undefined, props.apolloState)
+      this.reduxStore = createReduxStore(props.reduxState)
+      this.apolloClient = createApolloClient( this.reduxStore, props.apolloState)
       //this.apolloClient = createApolloClient(props.apolloState)
     }
 
-    render () {
-      return <App {...this.props} apolloClient={this.apolloClient} />
+    render() {
+      return <App {...this.props} apolloClient={this.apolloClient} reduxStore={ this.reduxStore} />
     }
   }
 }

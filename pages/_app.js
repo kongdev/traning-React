@@ -3,6 +3,7 @@ import React from 'react'
 import Link from 'next/link'
 import  withApollo from '../libs/with-apollo-client'
 import { ApolloProvider } from 'react-apollo';
+import { Provider } from 'react-redux'
 
 class MyApp extends App {
   static async getInitialProps ({ Component, router, ctx }) {
@@ -16,25 +17,28 @@ class MyApp extends App {
   }
 
   render () {
-    const {Component, apolloClient} = this.props
+    const {Component, apolloClient, reduxStore} = this.props
     return (
-      <ApolloProvider client={this.props.apolloClient}>
-        <Container>
-          <div>
-              <Link href="/">
-                  <a>
-                      home
-              </a>
-              </Link>
-              <Link href="/about">
-                  <a>
-                      about
-              </a>
-              </Link>
-          </div>
-        <Component {...this.props} />
-      </Container>
-    </ApolloProvider>
+      <Provider store={reduxStore}>
+          <ApolloProvider client={apolloClient}>
+          <Container>
+            <div>
+                <Link href="/">
+                    <a>
+                        home
+                </a>
+                </Link>
+                <Link href="/login">
+                    <a>
+                    login
+                </a>
+                </Link>
+            </div>
+          <Component {...this.props} />
+        </Container>
+      </ApolloProvider>
+      </Provider>
+      
     )
   }
 }
