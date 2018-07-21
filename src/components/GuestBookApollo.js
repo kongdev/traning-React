@@ -5,6 +5,7 @@ import { Query, Mutation, graphql } from 'react-apollo'
 import PostList from './PostList'
 import NewPostForm from './NewPostForm';
 
+
 const postsQuery = gql`
     query listPost {
   posts {
@@ -17,6 +18,17 @@ const postsQuery = gql`
   }
 }
 `
+
+const postCreatedSub = gql`subscription postCreate{
+	postCreated {
+	  id
+	  title
+	  tags {
+		name
+	  }
+	  content
+	}
+  }`
 
 const createPostMutation = gql`mutation createPost($postData : PostData!) {
     post :createPost(data: $postData){
@@ -46,50 +58,71 @@ export default class GuestBookApollo extends Component {
 }*/
 
 class GuestBookApollo extends Component {
-    render() {
-        //console.log(this.props.data)
-        if (this.props.loading) {
-            return <div>loading..</div>
-        }
-        return (
-            <React.Fragment>
-                <Mutation mutation={createPostMutation}
-                    update={(cache, result) => {
-                        console.log(result.data.post)
+	componentDidMount() {
+		this.props.subscribe()
+	}
 
-                        const { posts } = cache.readQuery({ query: postsQuery })
-                        const newPosts = [...posts, result.data.post]
-                        cache.writeQuery({
-                            query: postsQuery,
-                            data: { posts: newPosts }
-                        })
-                    }}>
-                    {createPostMutation => {
-                        return <NewPostForm onCreatePost={({ title, content }) => {
-                            const postData = {
-                                title, content
-                            }
-                            const variables = { postData }
+	render() {
+		//console.log(this.props.data)
+		if (this.props.loading) {
+			return <div>loading..</div>
+		}
+		return (
+			<React.Fragment>
+				<Mutation mutation={createPostMutation}
+					update={(cache, result) => {
+						console.log(result.data.post)
 
-                            createPostMutation({
-                                variables
-                            })
-                        }} />
-                    }}
-                </Mutation>
+						const { posts } = cache.readQuery({ query: postsQuery })
+						const newPosts = [...posts, result.data.post]
+						cache.writeQuery({
+							query: postsQuery,
+							data: { posts: newPosts }
+						})
+					}}>
+					{createPostMutation => {
+						return <NewPostForm onCreatePost={({ title, content }) => {
+							const postData = {
+								title, content
+							}
+							const variables = { postData }
 
-                <PostList posts={this.props.posts} />
-            </React.Fragment>
-        )
-    }
+							createPostMutation({
+								variables
+							})
+						}} />
+					}}
+				</Mutation>
+
+				<PostList posts={this.props.posts} />
+			</React.Fragment>
+		)
+	}
 }
 
 export default graphql(postsQuery, {
-    props: (res) => {
-        //console.log(res)
-        return {
-            posts: res.data.posts,
-            loading: res.data.loading
-        }
-    }
+	props: (res) => {
+		//console.log(res)
+		return {
+			posts: res.data.posts,
+			loading: res.data.loading,
+			subscribe: () => {
+				res.data.subscribeToMore({
+					document: postCreatedSub,
+					updateQuery: (prev, {subscriptionData}) => {
+						if(!subscriptionData.data.postCreated) return prev
+
+						const postCreated = subscriptionData.data.postCreated
+
+						return Object.assign({},prev,{
+							posts:[...prev.posts,postCreated]
+						})
+						//console.log('prev', prev)
+						//console.log('res', res)
+						//return prev
+					}
+				})
+			}
+		}
+	}
 })(GuestBookApollo)

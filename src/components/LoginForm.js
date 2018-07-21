@@ -73,7 +73,9 @@ class LoginForm extends Component {
                                     password : this.state.password
                                 }
                             })
-
+                            if(!result.data.token){
+                                return alert('Login Fail')
+                            }
                             console.log(result);
                             this.props.onLoginSuccess(result.data.token)
                         }}>
